@@ -58,9 +58,38 @@ app.post("/add", async (req, res) => {
     const newUser = new userModel({ userName, userEmail });
     const savedUser = await newUser.save();
 
-    res.status(200).json({ user: savedUser, status: "New user added successfully!!" });
+    res
+      .status(200)
+      .json({ user: savedUser, status: "New user added successfully!!" });
   } catch (err) {
-    res.status(500).json({ message: "Server error while adding user", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Server error while adding user", error: err.message });
+  }
+});
+
+app.put("/update/:userEmail", async (req, res) => {
+  const { userEmail } = req.params;
+  const { userName } = req.body;
+  try {
+    const updateUser = await userModel.findOneAndUpdate(
+      { userEmail: userEmail },
+      { userName: userName },
+      { new: true }
+    );
+    if (!updateUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res
+      .status(200)
+      .json({ user: updateUser, status: "User updated successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        message: "Server error while updating user",
+        error: err.message,
+      });
   }
 });
 
